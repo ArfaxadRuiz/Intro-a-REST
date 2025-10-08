@@ -2,11 +2,14 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from .models import Item
 from .serializers import ItemSerializer
+from .pagination import CustomPagination
 
 
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
+    # Activar paginación personalizada
+    pagination_class = CustomPagination
 
     # POST /api/items/
     def create(self, request, *args, **kwargs):
@@ -18,8 +21,13 @@ class ItemViewSet(viewsets.ModelViewSet):
 
     # GET /api/items/
     def list(self, request, *args, **kwargs):
-        items = self.get_queryset()
-        serializer = self.get_serializer(items, many=True)
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
     # GET /api/items/<id>/
