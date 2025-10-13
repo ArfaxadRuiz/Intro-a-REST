@@ -1,7 +1,17 @@
+# Dockerfile
 FROM python:3.11-slim
+
+# Directorio de trabajo
 WORKDIR /usr/src/app
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-COPY ./requirements.txt /usr/src/app/
+
+# Copiar requirements.txt
+COPY requirements.txt .
+
+# Instalar dependencias
 RUN pip install --no-cache-dir -r requirements.txt
-COPY . /usr/src/app/
+
+# Copiar todo el proyecto
+COPY . .
+
+# Comando por defecto
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
